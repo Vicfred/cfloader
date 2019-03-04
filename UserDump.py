@@ -8,20 +8,20 @@ import json
 
 if __name__ == "__main__":
     dialect = "postgresql"
-    username = config.DATABASE_CONFIG['user']
-    password = config.DATABASE_CONFIG['password']
-    host = config.DATABASE_CONFIG['host']
-    port = config.DATABASE_CONFIG['port']
-    dbname = config.DATABASE_CONFIG['dbname']
+    username = config.DATABASE_CONFIG["user"]
+    password = config.DATABASE_CONFIG["password"]
+    host = config.DATABASE_CONFIG["host"]
+    port = config.DATABASE_CONFIG["port"]
+    dbname = config.DATABASE_CONFIG["dbname"]
 
-    engine = create_engine(dialect + '://' + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
+    engine = create_engine(dialect + "://" + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
 
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
     print("Fetching users...")
-    with open('user.ratedList', mode="r", encoding="utf-8") as f:
+    with open("user.ratedList", mode="r", encoding="utf-8") as f:
         data = json.load(f)
     print("====================Done fetching users==========================")
 

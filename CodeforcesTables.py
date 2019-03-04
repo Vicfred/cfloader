@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -12,7 +12,7 @@ Base = declarative_base()
 
 # TODO: enforce non null fields where possible
 class Codeforcer(Base):
-    __tablename__ = 'codeforcer'
+    __tablename__ = "codeforcer"
     handle = Column(String(256), primary_key=True)
     email = Column(String(1024))
     vkId = Column(String(1024))
@@ -36,7 +36,7 @@ class Codeforcer(Base):
 
 # TODO: enforce non null fields where possible
 class Contest(Base):
-    __tablename__ = 'contest'
+    __tablename__ = "contest"
     id = Column(Integer, primary_key=True)
     name = Column(String(256))
     type = Column(Enum(Contest.Type))
@@ -58,10 +58,19 @@ class Contest(Base):
 
 # TODO: enforce non null fields where possible
 class RatingChange(Base):
-    __tablename__ = 'rating_change'
-    contestId = Column(Integer, primary_key=True)
+    __tablename__ = "rating_change"
+    __table_args__ = (
+        PrimaryKeyConstraint("contestId",
+                             "contestName",
+                             "handle",
+                             "rank",
+                             "ratingUpdateTimeSeconds",
+                             "oldRating",
+                             "newRating"),
+    )
+    contestId = Column(Integer)
     contestName = Column(String(256))
-    handle = Column(String(256), ForeignKey('codeforcer.handle'))
+    handle = Column(String(256), ForeignKey("codeforcer.handle"))
     rank = Column(Integer)
     ratingUpdateTimeSeconds = Column(Integer)
     oldRating = Column(Integer)
@@ -70,11 +79,11 @@ class RatingChange(Base):
 
 
 dialect = "postgresql"
-username = config.DATABASE_CONFIG['user']
-password = config.DATABASE_CONFIG['password']
-host = config.DATABASE_CONFIG['host']
-port = config.DATABASE_CONFIG['port']
-dbname = config.DATABASE_CONFIG['dbname']
-engine = create_engine(dialect + '://' + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
+username = config.DATABASE_CONFIG["user"]
+password = config.DATABASE_CONFIG["password"]
+host = config.DATABASE_CONFIG["host"]
+port = config.DATABASE_CONFIG["port"]
+dbname = config.DATABASE_CONFIG["dbname"]
+engine = create_engine(dialect + "://" + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
 
 Base.metadata.create_all(engine)
