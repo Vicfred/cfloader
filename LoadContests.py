@@ -1,10 +1,11 @@
 from sqlalchemy import create_engine
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
 
-from CodeforcesTables import Codeforcer, Base
+from CodeforcesTables import Contest, Base
 import config
 
-from codeforces import *
+import codeforces
 
 
 if __name__ == "__main__":
@@ -21,4 +22,12 @@ if __name__ == "__main__":
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
+    contests = codeforces.contest_list(True)
 
+    for contest in contests:
+        try:
+            session.add(Contest(**vars(contest)))
+            session.commit()
+        except (IntegrityError, InvalidRequestError):
+            pass
+        print(contest)

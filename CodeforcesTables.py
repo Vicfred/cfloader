@@ -9,6 +9,7 @@ import config
 
 Base = declarative_base()
 
+
 # TODO: enforce non null fields where possible
 class Codeforcer(Base):
     __tablename__ = 'codeforcer'
@@ -74,6 +75,6 @@ password = config.DATABASE_CONFIG['password']
 host = config.DATABASE_CONFIG['host']
 port = config.DATABASE_CONFIG['port']
 dbname = config.DATABASE_CONFIG['dbname']
-engine = create_engine(dialect+'://'+username+":"+password+"@"+host+":"+str(port)+"/"+dbname)
+engine = create_engine(dialect + '://' + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
 
 Base.metadata.create_all(engine)
