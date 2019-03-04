@@ -9,7 +9,7 @@ Base = declarative_base()
 
 class Codeforcer(Base):
     __tablename__ = 'codeforcer'
-    handle = Column(String, primary_key=True)
+    handle = Column(String(250), primary_key=True)
     email = Column(String(1024))
     vkId = Column(String(1024))
     openId = Column(String(250))
@@ -28,6 +28,18 @@ class Codeforcer(Base):
     friendOfCount = Column(Integer)
     avatar = Column(String(1024))
     titlePhoto = Column(String(1024))
+
+
+class RatingChange(Base):
+    __tablename__ = 'rating_change'
+    contestId = Column(Integer, primary_key=True)
+    contestName = Column(String(250))
+    handle = Column(String(250), ForeignKey('codeforcer.handle'))
+    rank = Column(Integer)
+    ratingUpdateTimeSeconds = Column(Integer)
+    oldRating = Column(Integer)
+    newRating = Column(Integer)
+    codeforcer = relationship(Codeforcer)
 
 
 dialect = "postgresql"
