@@ -2,18 +2,19 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+import config
 
 Base = declarative_base()
 
 
-class User(Base):
-    __tablename__ = 'user'
+class Codeforcer(Base):
+    __tablename__ = 'codeforcer'
     handle = Column(String, primary_key=True)
     email = Column(String(1024))
     vkId = Column(String(1024))
     openId = Column(String(250))
     firstName = Column(String(250))
-    secondName = Column(String(250))
+    lastName = Column(String(250))
     country = Column(String(250))
     city = Column(String(250))
     organization = Column(String(250))
@@ -29,6 +30,12 @@ class User(Base):
     titlePhoto = Column(String(1024))
 
 
-engine = create_engine('sqlite:///sqlalchemy_example.db')
+dialect = "postgresql"
+username = config.DATABASE_CONFIG['user']
+password = config.DATABASE_CONFIG['password']
+host = config.DATABASE_CONFIG['host']
+port = config.DATABASE_CONFIG['port']
+dbname = config.DATABASE_CONFIG['dbname']
+engine = create_engine(dialect+'://'+username+":"+password+"@"+host+":"+str(port)+"/"+dbname)
 
 Base.metadata.create_all(engine)
