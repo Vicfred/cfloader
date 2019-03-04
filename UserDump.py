@@ -5,7 +5,6 @@ from CodeforcesTables import Codeforcer, Base
 import config
 import json
 
-from codeforces import *
 
 if __name__ == "__main__":
     dialect = "postgresql"
