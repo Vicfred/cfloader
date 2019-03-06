@@ -22,7 +22,7 @@ if __name__ == "__main__":
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    contests = codeforces.contest_list(True)
+    contests = codeforces.contest_list(False)
 
     for contest in contests:
         try:
