@@ -1,5 +1,6 @@
 from time import sleep
 
+import redis
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker, load_only
@@ -8,7 +9,6 @@ from CodeforcesTables import Base, Codeforcer, RatingChange
 import config
 
 import codeforces
-
 
 if __name__ == "__main__":
     dialect = "postgresql"
@@ -24,17 +24,31 @@ if __name__ == "__main__":
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    user_handles = list()
+    r = redis.Redis(host='localhost', port=6379, db=0)
+
     print("Fetching the list of users...")
-    result = session.query(Codeforcer).options(load_only("handle"))
-    for row in result:
-        user_handles.append(row.handle)
-        print(row.handle)
+    redis_key = "codeforces:handles:changes"
+    if r.llen(redis_key) == 0:
+        result = session.query(Codeforcer).options(load_only("handle"))
+        for row in result:
+            r.lpush(redis_key, row.handle)
+            print(row.handle)
     print("Done fetching users.")
 
-    for handle in user_handles:
+    while r.llen(redis_key) > 0:
+        handle = r.rpop("codeforces:handles:changes").decode("utf-8")
         print(f"Fetching rating changes for user {handle}.")
-        user_changes = codeforces.user_rating(handle)
+        user_changes = list()
+        try:
+            user_changes = codeforces.user_rating(handle)
+            sleep(1/5)
+        except:
+            r.lpush(redis_key, handle)
+            continue
+            pass
+        if user_changes is None:
+            r.lpush(redis_key, handle)
+            continue
         for user_change in user_changes:
             try:
                 session.add(RatingChange(**vars(user_change)))
@@ -42,5 +56,5 @@ if __name__ == "__main__":
             except (IntegrityError, InvalidRequestError):
                 pass
             print(user_change)
-        sleep(1/5)
+        r.save()
     print("Done fetching all the users' rating changes.")
