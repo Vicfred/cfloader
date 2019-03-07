@@ -1,3 +1,4 @@
+# DONT USE, USE BY CONTEST INSTEAD
 from time import sleep
 
 import redis
