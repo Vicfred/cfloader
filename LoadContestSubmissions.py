@@ -1,9 +1,12 @@
 from time import sleep
 
 from dataclasses import astuple
+from http.client import IncompleteRead
+from requests.exceptions import ChunkedEncodingError
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
+from urllib3.exceptions import ProtocolError
 
 from CodeforcesTables import Base, Submission
 import config
@@ -25,12 +28,20 @@ if __name__ == "__main__":
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
+    print("Fetching contest list...")
     contests = codeforces.contest_list(False)
+    print(f"Got {len(contests)} contests.")
 
     for contest in contests:
         sleep(1/5)
         # only processing submissions for official contests
-        submissions = codeforces.contest_status(contest.id)
+        print("Fetching submissions...")
+        try:
+            submissions = codeforces.contest_status(contest.id)
+        except (ChunkedEncodingError, ProtocolError, IncompleteRead):
+            print(f"Fetching failed for contest {contest}, please requeue.")
+            pass
+        print("Done.")
         if submissions is None:
             print(f"Skipping contest {contest}.")
             continue
