@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, PrimaryKeyConstraint, Float, ARRAY
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, PrimaryKeyConstraint, Float, ARRAY, Enum
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -8,6 +8,7 @@ from sqlalchemy_utils import CompositeType, CompositeArray
 
 from codeforces import *
 from codeforces.Party import Party
+from codeforces.Problem import Problem
 
 import config
 
@@ -96,7 +97,8 @@ class Submission(Base):
                 Column('contestId', Integer),
                 Column('problemsetName', String(256)),
                 Column('index', String(256)),
-                Column('type', ENUM(Problem.Type)),  # BUG the type need to be created manually
+                Column('name', String(256)),
+                Column('type', Enum(Problem.Type)),  # BUG the type need to be created manually
                 Column('points', Float),
                 Column('rating', Integer),
                 Column('tags', ARRAY(String(256)))
@@ -108,7 +110,9 @@ class Submission(Base):
             'party',
             [
                 Column('contestId', Integer),
-                Column('members', CompositeArray(CompositeType('member', [Column('handle', String(256))]))),
+                # TODO use the composite type member
+                # Column('members', CompositeArray(CompositeType('member', [Column('handle', String(256))]))),
+                Column('members', String(256)),
                 Column('participantType', ENUM(Party.ParticipantType)),  # BUG the type need to be created manually
                 Column('teamId', Integer),
                 Column('teamName', String(256)),
