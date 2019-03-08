@@ -1,9 +1,13 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, PrimaryKeyConstraint
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, PrimaryKeyConstraint, Float, ARRAY
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 
+from sqlalchemy_utils import CompositeType, CompositeArray
+
 from codeforces import *
+from codeforces.Party import Party
 
 import config
 
@@ -39,8 +43,8 @@ class Contest(Base):
     __tablename__ = "contest"
     id = Column(Integer, primary_key=True)
     name = Column(String(256))
-    type = Column(Enum(Contest.Type))
-    phase = Column(Enum(Contest.Phase))
+    type = Column(ENUM(Contest.Type))
+    phase = Column(ENUM(Contest.Phase))
     frozen = Column(Boolean)
     durationSeconds = Column(Integer)
     startTimeSeconds = Column(Integer)
@@ -78,6 +82,50 @@ class RatingChange(Base):
     codeforcer = relationship(Codeforcer)
 
 
+# TODO: enforce non null fields where possible
+class Submission(Base):
+    __tablename__ = "submission"
+    id = Column(Integer, primary_key=True)
+    contestId = Column(Integer)
+    creationTimeSeconds = Column(Integer)
+    relativeTimeSeconds = Column(Integer)
+    problem = Column(
+        CompositeType(
+            'problem',
+            [
+                Column('contestId', Integer),
+                Column('problemsetName', String(256)),
+                Column('index', String(256)),
+                Column('type', ENUM(Problem.Type)),  # BUG the type need to be created manually
+                Column('points', Float),
+                Column('rating', Integer),
+                Column('tags', ARRAY(String(256)))
+            ]
+        )
+    )
+    author = Column(
+        CompositeType(
+            'party',
+            [
+                Column('contestId', Integer),
+                Column('members', CompositeArray(CompositeType('member', [Column('handle', String(256))]))),
+                Column('participantType', ENUM(Party.ParticipantType)),  # BUG the type need to be created manually
+                Column('teamId', Integer),
+                Column('teamName', String(256)),
+                Column('ghost', Boolean),
+                Column('room', Integer),
+                Column('startTimeSeconds', Integer)
+            ]
+        )
+    )
+    programmingLanguage = Column(String(256))
+    verdict = Column(ENUM(Submission.Verdict))
+    testset = Column(ENUM(Submission.TestSet))
+    passedTestCount = Column(Integer)
+    timeConsumedMillis = Column(Integer)
+    memoryConsumedBytes = Column(Integer)
+
+
 dialect = "postgresql"
 username = config.DATABASE_CONFIG["user"]
 password = config.DATABASE_CONFIG["password"]
@@ -85,5 +133,11 @@ host = config.DATABASE_CONFIG["host"]
 port = config.DATABASE_CONFIG["port"]
 dbname = config.DATABASE_CONFIG["dbname"]
 engine = create_engine(dialect + "://" + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
+
+# BUG the type need to be created manually
+problem_type = ENUM(Problem.Type)
+problem_type.create(engine)
+participant_type = ENUM(Party.ParticipantType)
+participant_type.create(engine)
 
 Base.metadata.create_all(engine)
