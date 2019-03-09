@@ -37,7 +37,7 @@ if __name__ == "__main__":
     print("Done fetching users.")
 
     while r.llen(redis_key) > 0:
-        handle = r.rpop("codeforces:handles:changes").decode("utf-8")
+        handle = r.rpop(redis_key).decode("utf-8")
         print(f"Fetching rating changes for user {handle}.")
         user_changes = list()
         try:
