@@ -112,7 +112,7 @@ class Submission(Base):
                 Column('contestId', Integer),
                 # TODO use the composite type member
                 # Column('members', CompositeArray(CompositeType('member', [Column('handle', String(256))]))),
-                Column('members', String(256)),
+                Column('members', ARRAY(String(256))),
                 Column('participantType', ENUM(Party.ParticipantType)),  # BUG the type need to be created manually
                 Column('teamId', Integer),
                 Column('teamName', String(256)),
