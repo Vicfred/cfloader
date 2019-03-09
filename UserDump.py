@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -33,7 +35,9 @@ if __name__ == "__main__":
         print(user)
     print(len(users))
 
+    t0 = time.time()
     session.bulk_insert_mappings(Codeforcer, users)
     session.commit()
 
     print("Done inserting into DB :D")
+    print(f"It took {time.time() - t0} seconds.")
