@@ -1,3 +1,4 @@
+# this script takes about 23.6 minutes to run on all no-gym contests (1135 contests as of 13-Jul-2019
 import time
 from time import sleep
 
