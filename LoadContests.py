@@ -31,11 +31,3 @@ if __name__ == "__main__":
         except (IntegrityError, InvalidRequestError):
             pass
         print(contest)
-    """
-    test_contest = Contest()
-    test_contest.id = 1194
-    test_contest.type = "ICPC"
-    print(test_contest)
-    session.add(test_contest)
-    session.commit()
-    """

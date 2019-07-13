@@ -1,4 +1,4 @@
-# This script takes about 40 seconds to run using a full dump of all the users
+# This script takes about 39 seconds to run using a full dump of all the users (189645 users) 13-Jul-2019
 import time
 
 from sqlalchemy import create_engine

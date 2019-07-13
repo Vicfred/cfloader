@@ -44,8 +44,8 @@ class Contest(Base):
     __tablename__ = "contest"
     id = Column(Integer, primary_key=True)
     name = Column(String(256))
-    type = Column(ENUM(Contest.Type))  # TODO: Conflicts with problem type
-    phase = Column(ENUM(Contest.Phase))
+    type = Column(ENUM(Contest.Type, name='contest_type_enum'))  # TODO: Conflicts with problem type
+    phase = Column(ENUM(Contest.Phase, name='contest_phase_enum'))
     frozen = Column(Boolean)
     durationSeconds = Column(Integer)
     startTimeSeconds = Column(Integer)
@@ -84,7 +84,6 @@ class RatingChange(Base):
 
 
 # TODO: enforce non null fields where possible
-"""
 class Submission(Base):
     __tablename__ = "submission"
     id = Column(Integer, primary_key=True)
@@ -99,7 +98,7 @@ class Submission(Base):
                 Column('problemsetName', String(256)),
                 Column('index', String(256)),
                 Column('name', String(256)),
-                Column('type', Enum(Problem.Type)),  # BUG the type need to be created manually TODO conflict with contest type
+                Column('type', ENUM(Problem.Type, name='problem_type_enum')),  # BUG the type need to be created manually TODO conflict with contest type
                 Column('points', Float),
                 Column('rating', Integer),
                 Column('tags', ARRAY(String(256)))
@@ -114,7 +113,7 @@ class Submission(Base):
                 # TODO use the composite type member
                 # Column('members', CompositeArray(CompositeType('member', [Column('handle', String(256))]))),
                 Column('members', ARRAY(String(256))),
-                Column('participantType', ENUM(Party.ParticipantType)),  # BUG the type need to be created manually
+                Column('participantType', ENUM(Party.ParticipantType, name='party_participant_type_enum')),  # BUG the type need to be created manually
                 Column('teamId', Integer),
                 Column('teamName', String(256)),
                 Column('ghost', Boolean),
@@ -124,12 +123,12 @@ class Submission(Base):
         )
     )
     programmingLanguage = Column(String(256))
-    verdict = Column(ENUM(Submission.Verdict))
-    testset = Column(ENUM(Submission.TestSet))
+    verdict = Column(ENUM(Submission.Verdict, name='submission_verdict_enum'))
+    testset = Column(ENUM(Submission.TestSet, name='submission_testset_enum'))
     passedTestCount = Column(Integer)
     timeConsumedMillis = Column(Integer)
     memoryConsumedBytes = Column(Integer)
-"""
+
 
 dialect = "postgresql"
 username = config.DATABASE_CONFIG["user"]
@@ -141,9 +140,9 @@ engine = create_engine(dialect + "://" + username + ":" + password + "@" + host 
 
 # BUG the type need to be created manually
 # TODO BUG problem type conflicts with problem type, maybe that is causing this
-#problem_type = ENUM(Problem.Type)
-#problem_type.create(engine)
-#participant_type = ENUM(Party.ParticipantType)
-#participant_type.create(engine)
+problem_type = ENUM(Problem.Type, name='problem_type_enum')
+problem_type.create(engine)
+participant_type = ENUM(Party.ParticipantType, name='party_participant_type_enum')
+participant_type.create(engine)
 
 Base.metadata.create_all(engine)
