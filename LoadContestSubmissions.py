@@ -1,4 +1,5 @@
 from time import sleep
+import time
 
 import redis
 from sqlalchemy import create_engine
@@ -34,10 +35,12 @@ if __name__ == "__main__":
             r.lpush(redis_key, contest.id)
         print(f"Got {len(contests)} contests.")
 
+    t0 = time.time()
+
     contest_submissions = list()
     while r.llen(redis_key) > 0:
         contest_id = r.rpop(redis_key).decode("utf-8")
-        sleep(1/5)
+        sleep(1/10)
         # only processing submissions for official contests
         print("Fetching submissions...")
         try:
@@ -87,6 +90,7 @@ if __name__ == "__main__":
             )
             contest_submissions.append(vars(submission))
         if len(contest_submissions) > 1_000_000:
+            t1 = time.time()
             try:
                 print(f"Inserting {len(contest_submissions)} submissions.")
                 session.bulk_insert_mappings(Submission, contest_submissions)
@@ -105,3 +109,6 @@ if __name__ == "__main__":
                 contest_submissions = list()
                 continue
                 pass
+            print(f"===It took {time.time() - t1} seconds to insert about 1M values into the DB.===")
+
+    print(f"=====It took {time.time() - t0} seconds to run the whole script.=====")
