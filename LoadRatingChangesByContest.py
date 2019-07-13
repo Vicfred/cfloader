@@ -1,3 +1,4 @@
+import time
 from time import sleep
 
 from sqlalchemy import create_engine
@@ -28,6 +29,7 @@ if __name__ == "__main__":
     contests = codeforces.contest_list(False)
     print(f"Done. Fetched {len(contests)} contests.")
 
+    t0 = time.time()
     for contest in contests:
         sleep(1/5)
         rating_changes = codeforces.contest_ratingChanges(contest.id)
@@ -37,3 +39,4 @@ if __name__ == "__main__":
         rating_changes = [vars(item) for item in rating_changes]
         session.bulk_insert_mappings(RatingChange, rating_changes)
         session.commit()
+    print(f"It took {time.time() - t0} seconds.")

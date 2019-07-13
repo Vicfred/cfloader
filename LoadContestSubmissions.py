@@ -1,18 +1,14 @@
 from time import sleep
 
-from dataclasses import astuple
-from http.client import IncompleteRead
-from requests.exceptions import ChunkedEncodingError
+import redis
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
-from urllib3.exceptions import ProtocolError
 
 from CodeforcesTables import Base, Submission
 import config
 
 import codeforces
-
 
 if __name__ == "__main__":
     dialect = "postgresql"
@@ -28,38 +24,48 @@ if __name__ == "__main__":
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    print("Fetching contest list...")
-    contests = codeforces.contest_list(False)
-    print(f"Got {len(contests)} contests.")
+    r = redis.Redis(host='localhost', port=6379, db=0)
 
-    for contest in contests:
+    print("Fetching contest list...")
+    redis_key = "codeforces:handles:changes"
+    if r.llen(redis_key) == 0:
+        contests = codeforces.contest_list(False)
+        for contest in contests:
+            r.lpush(redis_key, contest.id)
+        print(f"Got {len(contests)} contests.")
+
+    contest_submissions = list()
+    while r.llen(redis_key) > 0:
+        contest_id = r.rpop(redis_key).decode("utf-8")
         sleep(1/5)
         # only processing submissions for official contests
         print("Fetching submissions...")
         try:
-            submissions = codeforces.contest_status(contest.id)
-        except (ChunkedEncodingError, ProtocolError, IncompleteRead):
-            print(f"Fetching failed for contest {contest}, please requeue.")
+            submissions = codeforces.contest_status(contest_id)
+        except:
+            print(f"Fetching failed for contest_id: {contest_id}.")
+            r.lpush(redis_key, contest_id)
+            continue
             pass
         print("Done.")
+        print(f"Submission list length: {len(contest_submissions)}")
         if submissions is None:
-            print(f"Skipping contest {contest}.")
+            print(f"Skipping contest {contest_id}.")
             continue
-        print(f"Processing rating changes for contest {contest.name}, got {len(submissions)} submissions.")
-        contest_submissions = list()
+        print(f"Processing submissions for contest {contest_id}, got {len(submissions)} submissions.")
         for submission in submissions:
             problem = submission.problem
             problem.type = problem.type.name
             # needs the ordered tuple
             submission.problem = (
-                    problem.contestId,
-                    problem.problemSetName,
-                    problem.index,
-                    problem.name,
-                    problem.type,
-                    problem.points,
-                    problem.rating,
-                    problem.tags
+                problem.contestId,
+                problem.problemSetName,
+                problem.index,
+                problem.name,
+                problem.type,
+                problem.points,
+                problem.rating,
+                problem.tags
             )
             author = submission.author
             author.participantType = author.participantType.name
@@ -80,11 +86,22 @@ if __name__ == "__main__":
                 author.startTimeSeconds
             )
             contest_submissions.append(vars(submission))
-        try:
-            print(f"Inserting {len(contest_submissions)} submissions.")
-            session.bulk_insert_mappings(Submission, contest_submissions)
-            session.commit()
-            print("Done inserting. :D")
-        except (IntegrityError, InvalidRequestError):
-            print("Something went wrong, not inserting :<")
-            pass
+        if len(contest_submissions) > 1_000_000:
+            try:
+                print(f"Inserting {len(contest_submissions)} submissions.")
+                session.bulk_insert_mappings(Submission, contest_submissions)
+                session.commit()
+                print("Done inserting. :D")
+                contest_submissions = list()
+            except (IntegrityError, InvalidRequestError):
+                print("Something went wrong, not inserting :<")
+
+                for contest_submission in contest_submissions:
+                    try:
+                        session.add(Submission, **contest_submission)
+                        session.commit()
+                    except (IntegrityError, InvalidRequestError):
+                        continue
+                contest_submissions = list()
+                continue
+                pass

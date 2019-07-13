@@ -44,7 +44,7 @@ class Contest(Base):
     __tablename__ = "contest"
     id = Column(Integer, primary_key=True)
     name = Column(String(256))
-    type = Column(ENUM(Contest.Type))
+    type = Column(ENUM(Contest.Type))  # TODO: Conflicts with problem type
     phase = Column(ENUM(Contest.Phase))
     frozen = Column(Boolean)
     durationSeconds = Column(Integer)
@@ -84,6 +84,7 @@ class RatingChange(Base):
 
 
 # TODO: enforce non null fields where possible
+"""
 class Submission(Base):
     __tablename__ = "submission"
     id = Column(Integer, primary_key=True)
@@ -98,7 +99,7 @@ class Submission(Base):
                 Column('problemsetName', String(256)),
                 Column('index', String(256)),
                 Column('name', String(256)),
-                Column('type', Enum(Problem.Type)),  # BUG the type need to be created manually
+                Column('type', Enum(Problem.Type)),  # BUG the type need to be created manually TODO conflict with contest type
                 Column('points', Float),
                 Column('rating', Integer),
                 Column('tags', ARRAY(String(256)))
@@ -128,7 +129,7 @@ class Submission(Base):
     passedTestCount = Column(Integer)
     timeConsumedMillis = Column(Integer)
     memoryConsumedBytes = Column(Integer)
-
+"""
 
 dialect = "postgresql"
 username = config.DATABASE_CONFIG["user"]
@@ -139,9 +140,10 @@ dbname = config.DATABASE_CONFIG["dbname"]
 engine = create_engine(dialect + "://" + username + ":" + password + "@" + host + ":" + str(port) + "/" + dbname)
 
 # BUG the type need to be created manually
-problem_type = ENUM(Problem.Type)
-problem_type.create(engine)
-participant_type = ENUM(Party.ParticipantType)
-participant_type.create(engine)
+# TODO BUG problem type conflicts with problem type, maybe that is causing this
+#problem_type = ENUM(Problem.Type)
+#problem_type.create(engine)
+#participant_type = ENUM(Party.ParticipantType)
+#participant_type.create(engine)
 
 Base.metadata.create_all(engine)
