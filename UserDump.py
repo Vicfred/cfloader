@@ -1,3 +1,4 @@
+# This script takes about 40 seconds to run using a full dump of all the users
 import time
 
 from sqlalchemy import create_engine
