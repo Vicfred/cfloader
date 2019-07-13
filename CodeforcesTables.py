@@ -98,7 +98,7 @@ class Submission(Base):
                 Column('problemsetName', String(256)),
                 Column('index', String(256)),
                 Column('name', String(256)),
-                Column('type', ENUM(Problem.Type, name='problem_type_enum')),  # BUG the type need to be created manually TODO conflict with contest type
+                Column('type', ENUM(Problem.Type, name='problem_type_enum')),  # BUG the type need to be created manually
                 Column('points', Float),
                 Column('rating', Integer),
                 Column('tags', ARRAY(String(256)))
