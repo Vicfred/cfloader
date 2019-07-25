@@ -24,7 +24,7 @@ if __name__ == "__main__":
     session = DBSession()
 
     print("Fetching users...")
-    with open("user.ratedList", mode="r", encoding="utf-8") as f:
+    with open("user.ratedList.json", mode="r", encoding="utf-8") as f:
         data = json.load(f)
     print("====================Done fetching users==========================")
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     for user in users:
         print(user)
-    print(len(users))
+    print("Inserting", len(users), "into the DB.")
 
     t0 = time.time()
     session.bulk_insert_mappings(Codeforcer, users)
