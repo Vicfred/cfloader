@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     t0 = time.time()
     for contest in contests:
-        sleep(1/5)
+        sleep(1/10)
         rating_changes = codeforces.contest_ratingChanges(contest.id)
         if rating_changes is None:
             continue
