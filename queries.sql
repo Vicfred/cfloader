@@ -54,3 +54,8 @@ select * from rating_change where handle = 'Vicfred';
 select count(*) from rating_change;
 
 select * from submission where "programmingLanguage" = 'D' and "verdict" = 'OK';
+
+-- All mexican members in a given contest given by contest id
+SELECT rating_change."handle",rating_change."oldRating",rating_change."newRating"
+FROM contest JOIN rating_change ON contest."id" = rating_change."contestId"
+WHERE rating_change."handle" IN (SELECT handle FROM codeforcer WHERE country = 'Mexico') AND rating_change."contestId" = 1203;
