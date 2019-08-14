@@ -1,3 +1,4 @@
+# it takes less than 1s to run this
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
