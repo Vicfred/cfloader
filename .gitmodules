@@ -1,0 +1,3 @@
+[submodule "codeforcesapiwrapper"]
+	path = codeforcesapiwrapper
+	url = git@github.com:Vicfred/codeforcesapiwrapper
