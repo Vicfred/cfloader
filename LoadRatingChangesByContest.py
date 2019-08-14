@@ -1,5 +1,6 @@
 # this script takes about 23.6 minutes to run on all no-gym contests (1135 contests as of 13-Jul-2019 sleep(1/5)
 # this script takes about 21.5 minutes to run on all no-gym contests (1138 contests as of 25-Jul-2019 sleep(1/10)
+# this script takes about 19.7 minutes to run on all no-gym contests (1147 contests as of 25-Jul-2019 sleep(1/10)
 import time
 from time import sleep
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 
     t0 = time.time()
     for contest in contests:
-        sleep(1/10)
+        sleep(1/20)
         rating_changes = codeforces.contest_ratingChanges(contest.id)
         if rating_changes is None:
             continue
