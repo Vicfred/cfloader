@@ -1,6 +1,7 @@
-# this script takes about 23.6 minutes to run on all no-gym contests (1135 contests as of 13-Jul-2019 sleep(1/5)
-# this script takes about 21.5 minutes to run on all no-gym contests (1138 contests as of 25-Jul-2019 sleep(1/10)
-# this script takes about 19.7 minutes to run on all no-gym contests (1147 contests as of 25-Jul-2019 sleep(1/10)
+# this script takes about 23.6 minutes to run on all no-gym contests (1135 contests as of 13-Jul-2019 sleep(1/5))
+# this script takes about 21.5 minutes to run on all no-gym contests (1138 contests as of 25-Jul-2019 sleep(1/10))
+# this script takes about 19.7 minutes to run on all no-gym contests (1147 contests as of 25-Jul-2019 sleep(1/10))
+# this script takes about 19.7 minutes to run on all no-gym contests (1149 contests as of 20-Aug-2019 sleep(1/20))
 import time
 from time import sleep
 

@@ -1,4 +1,5 @@
 # it takes less than 1s to run this
+# it looks like now it takes a coutple of minutes FIXME
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm import sessionmaker
